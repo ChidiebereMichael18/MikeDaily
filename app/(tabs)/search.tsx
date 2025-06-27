@@ -1,6 +1,7 @@
 import { View, Text, TextInput, StyleSheet, ScrollView, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import Constants from 'expo-constants';
+import { ThemeContext } from '../theme/ThemeProvider';
 
 type NewsItem = {
   title: string;
@@ -13,9 +14,12 @@ type NewsItem = {
 
 const GNEWS_API_KEY = process.env.EXPO_PUBLIC_GNEWS_API_KEY || Constants.expoConfig?.extra?.gnewsApiKey;
 
-const NewsCard = ({ item }: { item: NewsItem }) => (
+const NewsCard = ({ item, colors }: { item: NewsItem; colors: any }) => (
   <TouchableOpacity
-    style={styles.newsCard}
+    style={[
+      styles.newsCard,
+      { backgroundColor: colors.card, shadowColor: colors.border }
+    ]}
     onPress={() => {
       if (item.url) {
         // You can use Linking.openURL(item.url) if you want
@@ -28,14 +32,15 @@ const NewsCard = ({ item }: { item: NewsItem }) => (
       style={styles.newsImage}
     />
     <View style={styles.newsContent}>
-      <Text style={styles.newsCategory}>{item.source?.name || 'Unknown'}</Text>
-      <Text style={styles.newsTitle}>{item.title}</Text>
-      <Text style={styles.newsDate}>{new Date(item.publishedAt).toLocaleString()}</Text>
+      <Text style={[styles.newsCategory, { color: colors.secondary }]}>{item.source?.name || 'Unknown'}</Text>
+      <Text style={[styles.newsTitle, { color: colors.text }]}>{item.title}</Text>
+      <Text style={[styles.newsDate, { color: colors.secondary }]}>{new Date(item.publishedAt).toLocaleString()}</Text>
     </View>
   </TouchableOpacity>
 );
 
 export default function Search() {
+  const { colors } = useContext(ThemeContext);
   const [query, setQuery] = useState('');
   const [news, setNews] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(false);
@@ -65,31 +70,35 @@ export default function Search() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Search News</Text>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <Text style={[styles.header, { color: colors.text }]}>Search News</Text>
       <View style={styles.searchBarContainer}>
         <TextInput
-          style={styles.searchInput}
+          style={[
+            styles.searchInput,
+            { backgroundColor: colors.input, color: colors.text, borderColor: colors.border }
+          ]}
           placeholder="Type to search news..."
+          placeholderTextColor={colors.secondary}
           value={query}
           onChangeText={setQuery}
           onSubmitEditing={handleSearch}
           returnKeyType="search"
         />
-        <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
-          <Text style={styles.searchButtonText}>Search</Text>
+        <TouchableOpacity style={[styles.searchButton, { backgroundColor: colors.primary }]} onPress={handleSearch}>
+          <Text style={[styles.searchButtonText, { color: colors.background }]}>Search</Text>
         </TouchableOpacity>
       </View>
       {loading ? (
-        <ActivityIndicator size="large" style={{ marginTop: 32 }} />
+        <ActivityIndicator size="large" style={{ marginTop: 32 }} color={colors.primary} />
       ) : error ? (
         <View style={styles.center}>
-          <Text>{error}</Text>
+          <Text style={{ color: colors.text }}>{error}</Text>
         </View>
       ) : (
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           {news.map((item, idx) => (
-            <NewsCard key={item.url + idx} item={item} />
+            <NewsCard key={item.url + idx} item={item} colors={colors} />
           ))}
         </ScrollView>
       )}
@@ -123,6 +132,7 @@ const styles = StyleSheet.create({
     padding: 12,
     fontSize: 16,
     backgroundColor: '#fafafa',
+    color: '#222',
   },
   searchButton: {
     backgroundColor: '#000',

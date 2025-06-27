@@ -1,25 +1,33 @@
 import { Tabs } from 'expo-router';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import React, { useContext } from 'react';
+import { ThemeContext } from '../theme/ThemeProvider';
 
 export default function TabLayout() {
-  return (
-    <Tabs screenOptions={{
-        headerStyle: {
-        backgroundColor: '#fff',
-        paddingTop: 20,
-        paddingBottom: 20,
-      },
-      headerShadowVisible: true,
-      tabBarActiveTintColor: '#000',
-      tabBarInactiveTintColor: 'gray',
-      tabBarLabelStyle: {
-        fontSize: 12,
-        paddingTop: 15,
-        paddingBottom: 50,
-        height: 100,
+  const { colors } = useContext(ThemeContext);
 
-      },
-    }}>
+  return (
+    <Tabs
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: colors.background,
+          paddingTop: 20,
+          paddingBottom: 20,
+        },
+        headerShadowVisible: true,
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: colors.secondary,
+        tabBarStyle: {
+          backgroundColor: colors.background,
+        },
+        tabBarLabelStyle: {
+          fontSize: 12,
+          paddingTop: 15,
+          paddingBottom: 50,
+          height: 100,
+        },
+      }}
+    >
       <Tabs.Screen
         name="home"
         options={{

@@ -1,9 +1,10 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Constants from 'expo-constants';
+import { ThemeContext } from '../theme/ThemeProvider';
 
 const GNEWS_API_KEY = process.env.EXPO_PUBLIC_GNEWS_API_KEY || Constants.expoConfig?.extra?.gnewsApiKey;
 
@@ -16,9 +17,12 @@ type NewsItem = {
   url: string;
 };
 
-const NewsCard = ({ item }: { item: NewsItem }) => (
+const NewsCard = ({ item, colors }: { item: NewsItem; colors: any }) => (
   <TouchableOpacity
-    style={styles.newsCard}
+    style={[
+      styles.newsCard,
+      { backgroundColor: colors.card, shadowColor: colors.border }
+    ]}
     onPress={() => {
       if (item.url) {
         // You can use Linking.openURL(item.url) if you want
@@ -31,9 +35,9 @@ const NewsCard = ({ item }: { item: NewsItem }) => (
       style={styles.newsImage}
     />
     <View style={styles.newsContent}>
-      <Text style={styles.newsCategory}>{item.source?.name || 'Unknown'}</Text>
-      <Text style={styles.newsTitle}>{item.title}</Text>
-      <Text style={styles.newsDate}>{new Date(item.publishedAt).toLocaleString()}</Text>
+      <Text style={[styles.newsCategory, { color: colors.secondary }]}>{item.source?.name || 'Unknown'}</Text>
+      <Text style={[styles.newsTitle, { color: colors.text }]}>{item.title}</Text>
+      <Text style={[styles.newsDate, { color: colors.secondary }]}>{new Date(item.publishedAt).toLocaleString()}</Text>
     </View>
   </TouchableOpacity>
 );
@@ -52,6 +56,7 @@ const categoryMap: Record<string, string> = {
 export default function CategoryScreen() {
   const { category } = useLocalSearchParams<{ category: string }>();
   const router = useRouter();
+  const { colors } = useContext(ThemeContext);
   const [news, setNews] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -81,21 +86,23 @@ export default function CategoryScreen() {
   }, [category]);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-        <MaterialCommunityIcons name="arrow-left" size={28} color="#007AFF" />
+        <MaterialCommunityIcons name="arrow-left" size={28} color={colors.primary} />
       </TouchableOpacity>
-      <Text style={styles.header}>{category?.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())} News</Text>
+      <Text style={[styles.header, { color: colors.text }]}>
+        {category?.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())} News
+      </Text>
       {loading ? (
-        <ActivityIndicator size="large" style={{ flex: 1 }} />
+        <ActivityIndicator size="large" style={{ flex: 1 }} color={colors.primary} />
       ) : error ? (
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-          <Text>{error}</Text>
+          <Text style={{ color: colors.text }}>{error}</Text>
         </View>
       ) : (
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           {news.map((item, idx) => (
-            <NewsCard key={item.url + idx} item={item} />
+            <NewsCard key={item.url + idx} item={item} colors={colors} />
           ))}
         </ScrollView>
       )}
@@ -106,13 +113,14 @@ export default function CategoryScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    // backgroundColor: '#fff',
   },
   header: {
     fontSize: 24,
     fontWeight: 'bold',
     padding: 16,
     textTransform: 'capitalize',
+    // color: '#222',
   },
   scrollContainer: {
     padding: 16,

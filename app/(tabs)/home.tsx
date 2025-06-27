@@ -1,7 +1,8 @@
 import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import Constants from 'expo-constants';
+import { ThemeContext } from '../theme/ThemeProvider';
 
 type NewsItem = {
   title: string;
@@ -13,10 +14,11 @@ type NewsItem = {
 };
 const GNEWS_API_KEY = process.env.EXPO_PUBLIC_GNEWS_API_KEY || Constants.expoConfig?.extra?.gnewsApiKey;
 
-const NewsCard = ({ item, featured }: { item: NewsItem; featured?: boolean }) => (
+const NewsCard = ({ item, featured, colors }: { item: NewsItem; featured?: boolean; colors: any }) => (
   <TouchableOpacity
     style={[
       styles.newsCard,
+      { backgroundColor: colors.card, shadowColor: colors.border },
       featured ? styles.featuredCard : styles.latestCard
     ]}
     onPress={() => {
@@ -34,17 +36,15 @@ const NewsCard = ({ item, featured }: { item: NewsItem; featured?: boolean }) =>
       ]}
     />
     <View style={styles.newsContent}>
-      <Text style={styles.newsCategory}>{item.source?.name || 'Unknown'}</Text>
-      <Text style={[
-        styles.newsTitle,
-        featured ? styles.featuredTitle : styles.latestTitle
-      ]}>{item.title}</Text>
-      <Text style={styles.newsDate}>{new Date(item.publishedAt).toLocaleString()}</Text>
+      <Text style={[styles.newsCategory, { color: colors.secondary }]}>{item.source?.name || 'Unknown'}</Text>
+      <Text style={[styles.newsTitle, featured ? styles.featuredTitle : styles.latestTitle, { color: colors.text }]}>{item.title}</Text>
+      <Text style={[styles.newsDate, { color: colors.secondary }]}>{new Date(item.publishedAt).toLocaleString()}</Text>
     </View>
   </TouchableOpacity>
 );
 
 export default function HomeScreen() {
+  const { colors } = useContext(ThemeContext);
   const [news, setNews] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -70,48 +70,48 @@ export default function HomeScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
-        <ActivityIndicator size="large" style={{ flex: 1 }} />
+      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+        <ActivityIndicator size="large" style={{ flex: 1 }} color={colors.primary} />
       </SafeAreaView>
     );
   }
 
   if (error) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-          <Text>{error}</Text>
+          <Text style={{ color: colors.text }}>{error}</Text>
         </View>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
-          <Text style={styles.greeting}>Good Day</Text>
-          <Text style={styles.subtitle}>Catch up with the latest news</Text>
+          <Text style={[styles.greeting, { color: colors.text }]}>Good Day</Text>
+          <Text style={[styles.subtitle, { color: colors.secondary }]}>Catch up with the latest news</Text>
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Featured</Text>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Featured</Text>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.featuredContainer}
           >
             {news.slice(0, 15).map((item, idx) => (
-              <NewsCard key={item.url + idx} item={item} featured />
+              <NewsCard key={item.url + idx} item={item} featured colors={colors} />
             ))}
           </ScrollView>
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Latest News</Text>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Latest News</Text>
           <View style={styles.latestContainer}>
             {news.map((item, idx) => (
-              <NewsCard key={item.url + idx} item={item} />
+              <NewsCard key={item.url + idx} item={item} colors={colors} />
             ))}
           </View>
         </View>

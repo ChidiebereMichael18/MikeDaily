@@ -2,6 +2,8 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-nati
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import React, { useContext } from 'react';
+import { ThemeContext } from '../theme/ThemeProvider';
 
 interface Category {
   name: string;
@@ -21,6 +23,7 @@ const categories: Category[] = [
 
 export default function Categories() {
   const router = useRouter();
+  const { colors } = useContext(ThemeContext);
 
   const handleCategoryPress = (category: string) => {
     // Navigate to /categories/[category] and pass category as param
@@ -31,18 +34,18 @@ export default function Categories() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.header}>Categories</Text>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <Text style={[styles.header, { color: colors.text }]}>Categories</Text>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.grid}>
           {categories.map((category) => (
             <TouchableOpacity
               key={category.name}
-              style={styles.categoryButton}
+              style={[styles.categoryButton, { backgroundColor: colors.card }]}
               onPress={() => handleCategoryPress(category.name)}
             >
-              <MaterialCommunityIcons name={category.icon} size={32} color="#000" />
-              <Text style={styles.categoryText}>{category.name}</Text>
+              <MaterialCommunityIcons name={category.icon} size={32} color={colors.primary} />
+              <Text style={[styles.categoryText, { color: colors.text }]}>{category.name}</Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -54,12 +57,13 @@ export default function Categories() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    // backgroundColor: '#fff',
   },
   header: {
     fontSize: 24,
     fontWeight: 'bold',
     padding: 16,
+    // color: '#222',
   },
   scrollContainer: {
     flexGrow: 1,
@@ -73,7 +77,7 @@ const styles = StyleSheet.create({
   categoryButton: {
     width: '48%',
     aspectRatio: 1,
-    backgroundColor: '#f5f5f5',
+    // backgroundColor: '#f5f5f5',
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
@@ -83,5 +87,6 @@ const styles = StyleSheet.create({
     marginTop: 8,
     fontSize: 16,
     fontWeight: '500',
+    // color: '#222',
   },
 });
