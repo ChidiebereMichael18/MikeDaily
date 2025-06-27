@@ -52,7 +52,7 @@ export default function HomeScreen() {
   useEffect(() => {
     const fetchNews = async () => {
       try {
-        const res = await fetch(`https://gnews.io/api/v4/top-headlines?token=${GNEWS_API_KEY}&lang=en&max=10`);
+        const res = await fetch(`https://gnews.io/api/v4/top-headlines?token=${GNEWS_API_KEY}&lang=en&max=30`);
         const data = await res.json();
         if (data.articles) {
           setNews(data.articles);
@@ -101,7 +101,7 @@ export default function HomeScreen() {
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.featuredContainer}
           >
-            {news.slice(0, 3).map((item, idx) => (
+            {news.slice(0, 15).map((item, idx) => (
               <NewsCard key={item.url + idx} item={item} featured />
             ))}
           </ScrollView>
