@@ -63,7 +63,7 @@ export default function Profile() {
           <SettingItem
             icon="translate"
             title="Language"
-            // onPress={() => router.push('/profile/language')}
+            onPress={() => router.push('/profile/language')}
           />
         </View>
 
