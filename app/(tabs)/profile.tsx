@@ -1,10 +1,18 @@
 import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { Link } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 
-const SettingItem = ({ icon, title }: { icon: string; title: string }) => (
-  <TouchableOpacity style={styles.settingItem}>
+const SettingItem = ({
+  icon,
+  title,
+  onPress,
+}: {
+  icon: string;
+  title: string;
+  onPress?: () => void;
+}) => (
+  <TouchableOpacity style={styles.settingItem} onPress={onPress}>
     <MaterialCommunityIcons name={icon as any} size={24} color="#333" />
     <Text style={styles.settingText}>{title}</Text>
     <MaterialCommunityIcons name="chevron-right" size={24} color="#666" />
@@ -12,6 +20,8 @@ const SettingItem = ({ icon, title }: { icon: string; title: string }) => (
 );
 
 export default function Profile() {
+  const router = useRouter();
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
@@ -26,15 +36,35 @@ export default function Profile() {
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Account Settings</Text>
-          <SettingItem icon="account-edit" title="Edit Profile" />
-          <SettingItem icon="bell-outline" title="Notifications" />
-          <SettingItem icon="shield-lock-outline" title="Privacy" />
+          <SettingItem
+            icon="account-edit"
+            title="Edit Profile"
+            onPress={() => router.push('/profile/edit')}
+          />
+          <SettingItem
+            icon="bell-outline"
+            title="Notifications"
+            onPress={() => router.push('/profile/notifications')}
+          />
+          <SettingItem
+            icon="shield-lock-outline"
+            title="Privacy"
+            // onPress={() => router.push('/profile/privacy')}
+          />
         </View>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Preferences</Text>
-          <SettingItem icon="theme-light-dark" title="Dark Mode" />
-          <SettingItem icon="translate" title="Language" />
+          <SettingItem
+            icon="theme-light-dark"
+            title="Dark Mode"
+            // onPress={() => router.push('/profile/darkmode')}
+          />
+          <SettingItem
+            icon="translate"
+            title="Language"
+            // onPress={() => router.push('/profile/language')}
+          />
         </View>
 
         <Link href='/(auth)/login' asChild>
@@ -75,7 +105,7 @@ const styles = StyleSheet.create({
   },
   section: {
     padding: 20,
-    gap:10,
+    gap: 10,
   },
   sectionTitle: {
     fontSize: 18,
