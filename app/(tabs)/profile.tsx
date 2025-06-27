@@ -49,7 +49,7 @@ export default function Profile() {
           <SettingItem
             icon="shield-lock-outline"
             title="Privacy"
-            // onPress={() => router.push('/profile/privacy')}
+            onPress={() => router.push('/profile/privacy')}
           />
         </View>
 
