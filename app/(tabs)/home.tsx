@@ -12,9 +12,25 @@ type NewsItem = {
   description: string;
   url: string;
 };
-const GNEWS_API_KEY = process.env.EXPO_PUBLIC_GNEWS_API_KEY || Constants.expoConfig?.extra?.gnewsApiKey;
+const GNEWS_API_KEY: string =
+  (process.env.EXPO_PUBLIC_GNEWS_API_KEY as string) ||
+  (Constants.expoConfig?.extra?.gnewsApiKey as string);
 
-const NewsCard = ({ item, featured, colors }: { item: NewsItem; featured?: boolean; colors: any }) => (
+interface NewsCardProps {
+  item: NewsItem;
+  featured?: boolean;
+  colors: {
+    background: string;
+    text: string;
+    card: string;
+    border: string;
+    primary: string;
+    secondary: string;
+    input: string;
+  };
+}
+
+const NewsCard = ({ item, featured, colors }: NewsCardProps) => (
   <TouchableOpacity
     style={[
       styles.newsCard,
