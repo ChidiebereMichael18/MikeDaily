@@ -58,7 +58,7 @@ export default function Profile() {
           <SettingItem
             icon="theme-light-dark"
             title="Dark Mode"
-            // onPress={() => router.push('/profile/darkmode')}
+            onPress={() => router.push('/profile/darkmode')}
           />
           <SettingItem
             icon="translate"
