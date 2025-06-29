@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import { View, Text, StyleSheet, Switch, Alert, AppState, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
 import { useRouter } from 'expo-router';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { ThemeContext } from '../theme/ThemeProvider';
 
 const GNEWS_API_KEY = process.env.EXPO_PUBLIC_GNEWS_API_KEY || Constants.expoConfig?.extra?.gnewsApiKey;
 
@@ -12,6 +13,7 @@ export default function NotificationsScreen() {
   const [enabled, setEnabled] = useState(false);
   const lastStoryId = useRef<string | null>(null);
   const router = useRouter();
+  const { colors } = useContext(ThemeContext);
 
   useEffect(() => {
     if (!enabled) return;
@@ -69,21 +71,21 @@ export default function NotificationsScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-        <MaterialCommunityIcons name="arrow-left" size={28} color="#007AFF" />
+        <MaterialCommunityIcons name="arrow-left" size={28} color={colors.primary} />
       </TouchableOpacity>
-      <Text style={styles.header}>Push Notifications</Text>
+      <Text style={[styles.header, { color: colors.text }]}>Push Notifications</Text>
       <View style={styles.row}>
-        <Text style={styles.label}>Enable notifications for new stories</Text>
+        <Text style={[styles.label, { color: colors.text }]}>Enable notifications for new stories</Text>
         <Switch
           value={enabled}
           onValueChange={toggleSwitch}
-          thumbColor={enabled ? '#007AFF' : '#ccc'}
-          trackColor={{ false: '#ccc', true: '#b3d4fc' }}
+          thumbColor={enabled ? colors.primary : colors.border}
+          trackColor={{ false: colors.border, true: '#b3d4fc' }}
         />
       </View>
-      <Text style={styles.info}>
+      <Text style={[styles.info, { color: colors.secondary }]}>
         You will receive a local notification when a new story is published (while the app is open or in background).
       </Text>
     </SafeAreaView>
@@ -93,7 +95,6 @@ export default function NotificationsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
     padding: 24,
   },
   header: {
@@ -113,7 +114,6 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   info: {
-    color: '#666',
     fontSize: 14,
     marginTop: 12,
   },
