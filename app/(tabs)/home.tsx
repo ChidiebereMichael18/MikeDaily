@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, ActivityIndicator, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import React, { useEffect, useState, useContext } from 'react';
 import Constants from 'expo-constants';
@@ -39,7 +39,7 @@ const NewsCard = ({ item, featured, colors }: NewsCardProps) => (
     ]}
     onPress={() => {
       if (item.url) {
-        // You can use Linking.openURL(item.url) if you want
+        Linking.openURL(item.url);
       }
     }}
     activeOpacity={0.8}
