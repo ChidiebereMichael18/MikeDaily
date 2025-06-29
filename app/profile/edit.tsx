@@ -1,19 +1,38 @@
 import React, { useContext, useState } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, TextInput, TouchableOpacity, Alert, Image } from 'react-native';
 import { ThemeContext } from '../theme/ThemeProvider';
 import { useRouter } from 'expo-router';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
 
 export default function EditProfile() {
   const { colors } = useContext(ThemeContext);
   const [name, setName] = useState('John Doe');
   const [email, setEmail] = useState('john.doe@example.com');
   const [bio, setBio] = useState('');
+  const [avatar, setAvatar] = useState<string | null>(null);
   const router = useRouter();
 
   const handleSave = () => {
     // You can add validation and API call here
     Alert.alert('Profile Updated', 'Your profile has been updated successfully.');
+  };
+
+  const pickImage = async () => {
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permission.granted) {
+      Alert.alert('Permission required', 'Please allow access to your photos to change your profile picture.');
+      return;
+    }
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.7,
+    });
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      setAvatar(result.assets[0].uri);
+    }
   };
 
   return (
@@ -22,6 +41,16 @@ export default function EditProfile() {
         <MaterialCommunityIcons name="arrow-left" size={28} color={colors.primary} />
       </TouchableOpacity>
       <Text style={[styles.header, { color: colors.text }]}>Edit Profile</Text>
+      <View style={styles.avatarContainer}>
+        <Image
+          source={{ uri: avatar || 'https://picsum.photos/200' }}
+          style={styles.avatar}
+        />
+        <TouchableOpacity style={[styles.editAvatarButton, { backgroundColor: colors.primary }]} onPress={pickImage}>
+          <MaterialCommunityIcons name="camera" size={20} color={colors.background} />
+          <Text style={[styles.editAvatarText, { color: colors.background }]}>Change Photo</Text>
+        </TouchableOpacity>
+      </View>
       <View style={styles.form}>
         <Text style={[styles.label, { color: colors.text }]}>Name</Text>
         <TextInput
@@ -80,6 +109,30 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 24,
     // color: '#222',
+  },
+  avatarContainer: {
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  avatar: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    marginBottom: 10,
+    backgroundColor: '#ccc',
+  },
+  editAvatarButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: 20,
+    paddingVertical: 6,
+    paddingHorizontal: 16,
+    marginTop: 4,
+  },
+  editAvatarText: {
+    marginLeft: 6,
+    fontSize: 14,
+    fontWeight: 'bold',
   },
   form: {
     // gap: 16,
