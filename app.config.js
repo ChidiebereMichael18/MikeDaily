@@ -43,6 +43,16 @@ export default {
     },
     extra: {
       gnewsApiKey: process.env.EXPO_PUBLIC_GNEWS_API_KEY,
+      eas: {
+        projectId: "4c6162bd-674e-4287-946c-f8bb9fa08ed0"
+      }
+    },
+    updates: {
+      url: "https://u.expo.dev/4c6162bd-674e-4287-946c-f8bb9fa08ed0",
+      fallbackToCacheTimeout: 0
+    },
+    runtimeVersion: {
+      policy: "appVersion"
     }
   }
 };
