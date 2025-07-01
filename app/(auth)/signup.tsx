@@ -2,12 +2,15 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'reac
 import React, { useState } from 'react';
 import { Link, useRouter } from 'expo-router';
 import Constants from 'expo-constants';
+import { useRef } from 'react';
+import { Modal } from 'react-native';
 
 export default function SignUpScreen() {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [successModalVisible, setSuccessModalVisible] = useState(false);
   const router = useRouter();
 
   const handleSignUp = async () => {
@@ -30,8 +33,11 @@ export default function SignUpScreen() {
       });
       const data = await res.json();
       if (res.ok) {
-        Alert.alert('Success', 'Account created successfully!');
-        router.replace('/home'); // navigate to home screen
+        setSuccessModalVisible(true);
+        setTimeout(() => {
+          setSuccessModalVisible(false);
+          router.replace('/home');
+        }, 1500);
       } else {
         Alert.alert('Error', data.message || 'Signup failed');
       }
@@ -90,6 +96,19 @@ export default function SignUpScreen() {
           </TouchableOpacity>
         </Link>
       </View>
+
+      <Modal
+        visible={successModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setSuccessModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.successText}>Account created successfully!</Text>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -145,6 +164,24 @@ const styles = StyleSheet.create({
   },
   signupLink: {
     color: '#000',
+    fontWeight: 'bold',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    padding: 30,
+    borderRadius: 12,
+    alignItems: 'center',
+    elevation: 5,
+  },
+  successText: {
+    fontSize: 18,
+    color: 'green',
     fontWeight: 'bold',
   },
 });

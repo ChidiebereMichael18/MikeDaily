@@ -1,14 +1,40 @@
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Modal } from 'react-native';
 import React, { useState } from 'react';
-import { Link } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [successModalVisible, setSuccessModalVisible] = useState(false);
+  const router = useRouter();
 
-  const handleLogin = () => {
-    // TODO: Implement login logic
-    console.log('Login attempted with:', email, password);
+  const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert('Error', 'Please fill all fields');
+      return;
+    }
+    try {
+      const backendUrl = process.env.EXPO_PUBLIC_BACKEND_URL;
+      const endpoint = `${backendUrl}/api/users/login`;
+
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setSuccessModalVisible(true);
+        setTimeout(() => {
+          setSuccessModalVisible(false);
+          router.replace('/home');
+        }, 1500);
+      } else {
+        Alert.alert('Error', data.message || 'Login failed');
+      }
+    } catch (err) {
+      Alert.alert('Error', 'Network error');
+    }
   };
 
   return (
@@ -34,11 +60,9 @@ export default function LoginScreen() {
         />
       </View>
 
-      <Link href="/home" asChild>
-        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-          <Text style={styles.loginButtonText}>Login</Text>
-        </TouchableOpacity>
-      </Link>
+      <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+        <Text style={styles.loginButtonText}>Login</Text>
+      </TouchableOpacity>
 
       <View style={styles.signupContainer}>
         <Text style={styles.signupText}>Don't have an account? </Text>
@@ -48,6 +72,19 @@ export default function LoginScreen() {
           </TouchableOpacity>
         </Link>
       </View>
+
+      <Modal
+        visible={successModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setSuccessModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.successText}>Login successful!</Text>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -103,6 +140,24 @@ const styles = StyleSheet.create({
   },
   signupLink: {
     color: '#000',
+    fontWeight: 'bold',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    padding: 30,
+    borderRadius: 12,
+    alignItems: 'center',
+    elevation: 5,
+  },
+  successText: {
+    fontSize: 18,
+    color: 'green',
     fontWeight: 'bold',
   },
 });
