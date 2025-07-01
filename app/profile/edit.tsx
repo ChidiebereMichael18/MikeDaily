@@ -9,7 +9,6 @@ export default function EditProfile() {
   const { colors } = useContext(ThemeContext);
   const [name, setName] = useState('John Doe');
   const [email, setEmail] = useState('john.doe@example.com');
-  const [bio, setBio] = useState('');
   const [avatar, setAvatar] = useState<string | null>(null);
   const router = useRouter();
 
@@ -52,7 +51,7 @@ export default function EditProfile() {
         </TouchableOpacity>
       </View>
       <View style={styles.form}>
-        <Text style={[styles.label, { color: colors.text }]}>Name</Text>
+        <Text style={[styles.label, { color: colors.text }]}>Username</Text>
         <TextInput
           style={[styles.input, { backgroundColor: colors.input, color: colors.text, borderColor: colors.border }]}
           value={name}
@@ -69,20 +68,6 @@ export default function EditProfile() {
           placeholderTextColor={colors.secondary}
           keyboardType="email-address"
           autoCapitalize="none"
-        />
-        <Text style={[styles.label, { color: colors.text }]}>Bio</Text>
-        <TextInput
-          style={[
-            styles.input,
-            styles.textArea,
-            { backgroundColor: colors.input, color: colors.text, borderColor: colors.border }
-          ]}
-          value={bio}
-          onChangeText={setBio}
-          placeholder="Tell us about yourself"
-          placeholderTextColor={colors.secondary}
-          multiline
-          numberOfLines={4}
         />
         <TouchableOpacity style={[styles.saveButton, { backgroundColor: colors.primary }]} onPress={handleSave}>
           <Text style={[styles.saveButtonText, { color: colors.background }]}>Save</Text>

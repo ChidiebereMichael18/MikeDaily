@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Link } from 'expo-router';
 
 export default function SignUpScreen() {
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -17,6 +18,14 @@ export default function SignUpScreen() {
       <Text style={styles.subtitle}>Create Account</Text>
 
       <View style={styles.inputContainer}>
+         <TextInput
+          style={styles.input}
+          placeholder="Username"
+          value={username}
+          onChangeText={setUsername}
+          keyboardType="default"
+          autoCapitalize="none"
+        />
         <TextInput
           style={styles.input}
           placeholder="Email"
