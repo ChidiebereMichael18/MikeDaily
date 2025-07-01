@@ -1,20 +1,76 @@
 import React, { useContext, useState } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, TextInput, TouchableOpacity, Alert, Image } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, TextInput, TouchableOpacity, Alert, Image, Modal } from 'react-native';
 import { ThemeContext } from '../theme/ThemeProvider';
 import { useRouter } from 'expo-router';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function EditProfile() {
   const { colors } = useContext(ThemeContext);
   const [name, setName] = useState('John Doe');
   const [email, setEmail] = useState('john.doe@example.com');
   const [avatar, setAvatar] = useState<string | null>(null);
+  const [oldPassword, setOldPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [successModalVisible, setSuccessModalVisible] = useState(false);
   const router = useRouter();
 
-  const handleSave = () => {
-    // You can add validation and API call here
-    Alert.alert('Profile Updated', 'Your profile has been updated successfully.');
+  // Fetch user info from AsyncStorage on mount
+  React.useEffect(() => {
+    const fetchUser = async () => {
+      const storedName = await AsyncStorage.getItem('username');
+      const storedEmail = await AsyncStorage.getItem('email');
+      if (storedName) setName(storedName);
+      if (storedEmail) setEmail(storedEmail);
+    };
+    fetchUser();
+  }, []);
+
+  const handleSave = async () => {
+    // ...existing validation for name/email if needed...
+
+    if (!oldPassword || !newPassword) {
+      Alert.alert('Error', 'Please enter both old and new password.');
+      return;
+    }
+
+    try {
+      const userId = await AsyncStorage.getItem('userId');
+      if (!userId) {
+        Alert.alert('Error', 'User not found.');
+        return;
+      }
+      const backendUrl = process.env.EXPO_PUBLIC_BACKEND_URL;
+      const endpoint = `${backendUrl}/api/users/${userId}`;
+
+      const res = await fetch(endpoint, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: name,
+          email: email,
+          oldPassword,
+          password: newPassword,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        await AsyncStorage.setItem('username', name);
+        await AsyncStorage.setItem('email', email);
+        setOldPassword('');
+        setNewPassword('');
+        setSuccessModalVisible(true);
+        setTimeout(() => {
+          setSuccessModalVisible(false);
+          router.replace('/profile');
+        }, 1500);
+      } else {
+        Alert.alert('Error', data.message || 'Update failed');
+      }
+    } catch (err) {
+      Alert.alert('Error', 'Network error');
+    }
   };
 
   const pickImage = async () => {
@@ -69,10 +125,53 @@ export default function EditProfile() {
           keyboardType="email-address"
           autoCapitalize="none"
         />
+        <Text style={[styles.label, { color: colors.text }]}>Old Password</Text>
+        <TextInput
+          style={[styles.input, { backgroundColor: colors.input, color: colors.text, borderColor: colors.border }]}
+          value={oldPassword}
+          onChangeText={setOldPassword}
+          placeholder="Old password"
+          placeholderTextColor={colors.secondary}
+          secureTextEntry
+        />
+        <Text style={[styles.label, { color: colors.text }]}>New Password</Text>
+        <TextInput
+          style={[styles.input, { backgroundColor: colors.input, color: colors.text, borderColor: colors.border }]}
+          value={newPassword}
+          onChangeText={setNewPassword}
+          placeholder="New password"
+          placeholderTextColor={colors.secondary}
+          secureTextEntry
+        />
         <TouchableOpacity style={[styles.saveButton, { backgroundColor: colors.primary }]} onPress={handleSave}>
           <Text style={[styles.saveButtonText, { color: colors.background }]}>Save</Text>
         </TouchableOpacity>
       </View>
+      <Modal
+        visible={successModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setSuccessModalVisible(false)}
+      >
+        <View style={{
+          flex: 1,
+          backgroundColor: 'rgba(0,0,0,0.3)',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+          <View style={{
+            backgroundColor: '#fff',
+            padding: 30,
+            borderRadius: 12,
+            alignItems: 'center',
+            elevation: 5,
+          }}>
+            <Text style={{ fontSize: 18, color: 'green', fontWeight: 'bold' }}>
+              Profile updated successfully!
+            </Text>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }

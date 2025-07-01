@@ -2,6 +2,8 @@ import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView } from 'rea
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Link, useRouter } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const SettingItem = ({
   icon,
@@ -21,6 +23,22 @@ const SettingItem = ({
 
 export default function Profile() {
   const router = useRouter();
+  const [user, setUser] = useState<{ username: string; email: string } | null>(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const username = await AsyncStorage.getItem('username');
+        const email = await AsyncStorage.getItem('email');
+        if (username && email) {
+          setUser({ username, email });
+        }
+      } catch (err) {
+        // handle error or fallback
+      }
+    };
+    fetchUser();
+  }, []);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -30,8 +48,8 @@ export default function Profile() {
             source={{ uri: 'https://picsum.photos/200' }}
             style={styles.avatar}
           />
-          <Text style={styles.name}>John Doe</Text>
-          <Text style={styles.email}>john.doe@example.com</Text>
+          <Text style={styles.name}>{user?.username || 'Username'}</Text>
+          <Text style={styles.email}>{user?.email || 'Email'}</Text>
         </View>
 
         <View style={styles.section}>

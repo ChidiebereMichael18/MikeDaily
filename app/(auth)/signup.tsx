@@ -4,6 +4,7 @@ import { Link, useRouter } from 'expo-router';
 import Constants from 'expo-constants';
 import { useRef } from 'react';
 import { Modal } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function SignUpScreen() {
   const [username, setUsername] = useState('');
@@ -33,6 +34,11 @@ export default function SignUpScreen() {
       });
       const data = await res.json();
       if (res.ok) {
+        // Store user details in AsyncStorage
+        await AsyncStorage.setItem('userId', data.userId);
+        await AsyncStorage.setItem('email', email);
+        await AsyncStorage.setItem('username', username);
+
         setSuccessModalVisible(true);
         setTimeout(() => {
           setSuccessModalVisible(false);

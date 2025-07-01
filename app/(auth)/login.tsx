@@ -1,6 +1,7 @@
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Modal } from 'react-native';
 import React, { useState } from 'react';
 import { Link, useRouter } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -24,6 +25,11 @@ export default function LoginScreen() {
       });
       const data = await res.json();
       if (res.ok) {
+        // Store user details in AsyncStorage
+        await AsyncStorage.setItem('userId', data.userId);
+        if (data.email) await AsyncStorage.setItem('email', data.email);
+        if (data.username) await AsyncStorage.setItem('username', data.username);
+
         setSuccessModalVisible(true);
         setTimeout(() => {
           setSuccessModalVisible(false);
