@@ -1,15 +1,43 @@
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import React, { useState } from 'react';
-import { Link } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
+import Constants from 'expo-constants';
 
 export default function SignUpScreen() {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const router = useRouter();
 
-  const handleSignUp = () => {
-    console.log('Signup attempted with:', email, password, confirmPassword);
+  const handleSignUp = async () => {
+    if (!username || !email || !password || !confirmPassword) {
+      Alert.alert('Error', 'Please fill all fields');
+      return;
+    }
+    if (password !== confirmPassword) {
+      Alert.alert('Error', 'Passwords do not match');
+      return;
+    }
+    try {
+      const backendUrl = process.env.EXPO_PUBLIC_BACKEND_URL;
+      const endpoint = `${backendUrl}/api/users/create`;
+
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, email, password }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        Alert.alert('Success', 'Account created successfully!');
+        router.replace('/home'); // navigate to home screen
+      } else {
+        Alert.alert('Error', data.message || 'Signup failed');
+      }
+    } catch (err) {
+      Alert.alert('Error', 'Network error');
+    }
   };
 
   return (
@@ -120,3 +148,4 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
+
