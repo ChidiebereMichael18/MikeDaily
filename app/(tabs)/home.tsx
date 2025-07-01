@@ -106,7 +106,16 @@ export default function HomeScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
-          <Text style={[styles.greeting, { color: colors.text }]}>Good Day</Text>
+          {/* Greeting based on time of day */}
+          <Text style={[styles.greeting, { color: colors.text }]}
+          >
+            {(() => {
+              const hour = new Date().getHours();
+              if (hour < 12) return 'Good Morning';
+              if (hour < 17) return 'Good Afternoon';
+              return 'Good Evening';
+            })()}
+          </Text>
           <Text style={[styles.subtitle, { color: colors.secondary }]}>Catch up with the latest news</Text>
         </View>
 
