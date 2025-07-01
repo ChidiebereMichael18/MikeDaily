@@ -4,6 +4,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Link, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
 
 const SettingItem = ({
   icon,
@@ -23,29 +24,35 @@ const SettingItem = ({
 
 export default function Profile() {
   const router = useRouter();
-  const [user, setUser] = useState<{ username: string; email: string } | null>(null);
+  const [user, setUser] = useState<{ username: string; email: string; avatar?: string } | null>(null);
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const username = await AsyncStorage.getItem('username');
-        const email = await AsyncStorage.getItem('email');
-        if (username && email) {
-          setUser({ username, email });
-        }
-      } catch (err) {
-        // handle error or fallback
-      }
-    };
-    fetchUser();
-  }, []);
+  const fetchUser = async () => {
+    try {
+      const username = await AsyncStorage.getItem('username');
+      const email = await AsyncStorage.getItem('email');
+      const avatar = await AsyncStorage.getItem('avatar');
+      setUser({
+        username: username || '',
+        email: email || '',
+        avatar: avatar && avatar !== '' ? avatar : undefined,
+      });
+    } catch (err) {
+      // handle error or fallback
+    }
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchUser();
+    }, [])
+  );
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
         <View style={styles.header}>
           <Image 
-            source={{ uri: 'https://picsum.photos/200' }}
+            source={{ uri: user?.avatar && user.avatar !== '' ? user.avatar : 'https://picsum.photos/200' }}
             style={styles.avatar}
           />
           <Text style={styles.name}>{user?.username || 'Username'}</Text>

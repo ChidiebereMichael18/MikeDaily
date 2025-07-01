@@ -21,20 +21,15 @@ export default function EditProfile() {
     const fetchUser = async () => {
       const storedName = await AsyncStorage.getItem('username');
       const storedEmail = await AsyncStorage.getItem('email');
+      const storedAvatar = await AsyncStorage.getItem('avatar');
       if (storedName) setName(storedName);
       if (storedEmail) setEmail(storedEmail);
+      if (storedAvatar) setAvatar(storedAvatar);
     };
     fetchUser();
   }, []);
 
   const handleSave = async () => {
-    // ...existing validation for name/email if needed...
-
-    if (!oldPassword || !newPassword) {
-      Alert.alert('Error', 'Please enter both old and new password.');
-      return;
-    }
-
     try {
       const userId = await AsyncStorage.getItem('userId');
       if (!userId) {
@@ -44,20 +39,26 @@ export default function EditProfile() {
       const backendUrl = process.env.EXPO_PUBLIC_BACKEND_URL;
       const endpoint = `${backendUrl}/api/users/${userId}`;
 
+      // Only include password fields if both are filled
+      const body: any = {
+        username: name,
+        email: email,
+      };
+      if (oldPassword && newPassword) {
+        body.oldPassword = oldPassword;
+        body.password = newPassword;
+      }
+
       const res = await fetch(endpoint, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          username: name,
-          email: email,
-          oldPassword,
-          password: newPassword,
-        }),
+        body: JSON.stringify(body),
       });
       const data = await res.json();
       if (res.ok) {
         await AsyncStorage.setItem('username', name);
         await AsyncStorage.setItem('email', email);
+        if (avatar) await AsyncStorage.setItem('avatar', avatar); // save avatar to AsyncStorage
         setOldPassword('');
         setNewPassword('');
         setSuccessModalVisible(true);
@@ -86,7 +87,9 @@ export default function EditProfile() {
       quality: 0.7,
     });
     if (!result.canceled && result.assets && result.assets.length > 0) {
-      setAvatar(result.assets[0].uri);
+      const uri = result.assets[0].uri;
+      setAvatar(uri);
+      await AsyncStorage.setItem('avatar', uri);
     }
   };
 
@@ -253,3 +256,4 @@ const styles = StyleSheet.create({
     // color: '#fff',
   },
 });
+
