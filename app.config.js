@@ -41,7 +41,10 @@ export default {
       typedRoutes: true
     },
     extra: {
-      gnewsApiKey: process.env.EXPO_PUBLIC_GNEWS_API_KEY
+      gnewsApiKey: process.env.EXPO_PUBLIC_GNEWS_API_KEY,
+      eas: {
+        projectId: "4c6162bd-674e-4287-946c-f8bb9fa08ed0"
+      }
     }
   }
 };
