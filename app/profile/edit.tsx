@@ -219,7 +219,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   form: {
-    // gap: 16,
+    marginHorizontal: 16,
   },
   label: {
     fontSize: 16,
