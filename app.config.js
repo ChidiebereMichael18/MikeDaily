@@ -18,7 +18,8 @@ export default {
         foregroundImage: "./assets/images/adaptive-icon.png",
         backgroundColor: "#ffffff"
       },
-      edgeToEdgeEnabled: true
+      edgeToEdgeEnabled: true,
+      package: "com.classicmike.mikedaily" // <-- Add your unique Android package name here
     },
     web: {
       bundler: "metro",
