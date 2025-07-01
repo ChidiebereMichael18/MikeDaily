@@ -2,6 +2,7 @@ import { View, Text, TextInput, StyleSheet, ScrollView, Image, TouchableOpacity,
 import React, { useState, useContext } from 'react';
 import Constants from 'expo-constants';
 import { ThemeContext } from '../theme/ThemeProvider';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 type NewsItem = {
   title: string;
@@ -70,7 +71,7 @@ export default function Search() {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <Text style={[styles.header, { color: colors.text }]}>Search News</Text>
       <View style={styles.searchBarContainer}>
         <TextInput
@@ -102,7 +103,7 @@ export default function Search() {
           ))}
         </ScrollView>
       )}
-    </View>
+    </SafeAreaView>
   );
 }
 

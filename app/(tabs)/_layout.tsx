@@ -20,7 +20,7 @@ export default function TabLayout() {
           backgroundColor: colors.background,
           borderTopWidth: 0.5,
           borderTopColor: colors.border || '#eee',
-          height: 70,
+          height: 100,
           paddingBottom: 12,
           paddingTop: 8,
           elevation: 10,
